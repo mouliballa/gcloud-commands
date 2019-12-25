@@ -1,0 +1,22 @@
+gcloud compute instances create vmname\
+    --zone=us-central1-a \
+    --image-family=debian-9 \
+    --image-project=debian-cloud \
+    --tags=allow-ssh,allow-health-check \
+    --network=default \
+ --no-address \
+    --metadata=startup-script='#! /bin/bash
+apt-get update
+apt-get install apache2 -y
+a2ensite default-ssl
+a2enmod ssl
+vm_hostname="$(curl -H "Metadata-Flavor:Google" \
+http://169.254.169.254/computeMetadata/v1/instance/name)"
+echo "Page served from: $vm_hostname" | \
+tee /var/www/html/index.html
+systemctl restart apache2'
+
+
+
+
+# with --no-address using gcloud (External address: None in the Developers Console)
